@@ -1,0 +1,31 @@
+{% extends  'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block main %}
+<div class="card">
+<div class="card-body">
+<h1>{{ question.question_text }}</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% url 'polls:vote' question.id %}" method="post">
+{% csrf_token %}
+{% for choice in question.choice_set.all %}
+    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+    <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+{% endfor %}
+<input type="submit" value="Vote" class="btn btn-primary btn-block">
+</form>
+
+{% if request.user.id == question.profile.user.id %}
+<form action="{% url 'polls:delete' question.id %}" style="margin-top:10px">
+    <input type="submit" value="Delete" class="btn btn-danger btn-block">
+</form>
+{% endif %}
+
+Author: <a href="{% url 'polls:user_account' question.profile.user.id %}">{{ question.profile.user.first_name }} {{ question.profile.user.last_name }}</a>
+<br>
+    <a href="{% url 'polls:user_account' request.user.id %}">To my account</a>
+</div>
+</div>
+{% endblock %}
